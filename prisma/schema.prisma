@@ -6,7 +6,6 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 model User {
@@ -48,7 +47,7 @@ model ProductOption {
   id            String              @id @default(uuid())
   name          String
   type          ProductOptionType
-  category      ProductCategory?    @relation(fields: [categoryId], references: [id], onDelete: SET NULL)
+  category      ProductCategory?    @relation(fields: [categoryId], references: [id])
   categoryId    String?
   createdAt     DateTime            @default(now())
   updatedAt     DateTime            @updatedAt
@@ -59,9 +58,9 @@ model ProductOption {
 model ProductOptionItem {
   id            String              @id @default(uuid())
   optionId      String
-  option        ProductOption       @relation(fields: [optionId], references: [id], onDelete: CASCADE)
+  option        ProductOption       @relation(fields: [optionId], references: [id])
   productId     String
-  product       Product             @relation(fields: [productId], references: [id], onDelete: CASCADE)
+  product       Product             @relation(fields: [productId], references: [id])
   createdAt     DateTime            @default(now())
 }
 
@@ -82,7 +81,7 @@ model Product {
 model OrderStatusHistory {
   id        String         @id @default(uuid())
   orderId   String
-  order     Order          @relation(fields: [orderId], references: [id], onDelete: CASCADE)
+  order     Order          @relation(fields: [orderId], references: [id])
   status    OrderStatus
   note      String?
   changedBy String?
@@ -106,7 +105,7 @@ model Order {
 model OrderItem {
   id        String      @id @default(uuid())
   orderId   String
-  order     Order       @relation(fields: [orderId], references: [id], onDelete: CASCADE)
+  order     Order       @relation(fields: [orderId], references: [id])
   productId String
   product   Product     @relation(fields: [productId], references: [id])
   options   OrderOption[]
@@ -119,7 +118,7 @@ model OrderItem {
 model OrderOption {
   id          String       @id @default(uuid())
   orderItemId String
-  orderItem   OrderItem    @relation(fields: [orderItemId], references: [id], onDelete: CASCADE)
+  orderItem   OrderItem    @relation(fields: [orderItemId], references: [id])
   optionId    String?
   option      ProductOption? @relation(fields: [optionId], references: [id])
   value       String
