@@ -6,6 +6,7 @@ generator client {
 
 datasource db {
   provider = "sqlite"
+  url      = "file:./prisma/dev.db"
 }
 
 model User {
@@ -47,7 +48,7 @@ model ProductOption {
   id            String              @id @default(uuid())
   name          String
   type          ProductOptionType
-  category      ProductCategory?    @relation(fields: [categoryId], references: [id])
+  category      ProductCategory?    @relation(fields: [categoryId], references: [id], onDelete: SET NULL)
   categoryId    String?
   createdAt     DateTime            @default(now())
   updatedAt     DateTime            @updatedAt
@@ -58,9 +59,9 @@ model ProductOption {
 model ProductOptionItem {
   id            String              @id @default(uuid())
   optionId      String
-  option        ProductOption       @relation(fields: [optionId], references: [id], onDelete: Cascade)
+  option        ProductOption       @relation(fields: [optionId], references: [id], onDelete: CASCADE)
   productId     String
-  product       Product             @relation(fields: [productId], references: [id], onDelete: Cascade)
+  product       Product             @relation(fields: [productId], references: [id], onDelete: CASCADE)
   createdAt     DateTime            @default(now())
 }
 
@@ -81,7 +82,7 @@ model Product {
 model OrderStatusHistory {
   id        String         @id @default(uuid())
   orderId   String
-  order     Order          @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  order     Order          @relation(fields: [orderId], references: [id], onDelete: CASCADE)
   status    OrderStatus
   note      String?
   changedBy String?
@@ -105,7 +106,7 @@ model Order {
 model OrderItem {
   id        String      @id @default(uuid())
   orderId   String
-  order     Order       @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  order     Order       @relation(fields: [orderId], references: [id], onDelete: CASCADE)
   productId String
   product   Product     @relation(fields: [productId], references: [id])
   options   OrderOption[]
@@ -118,7 +119,7 @@ model OrderItem {
 model OrderOption {
   id          String       @id @default(uuid())
   orderItemId String
-  orderItem   OrderItem    @relation(fields: [orderItemId], references: [id], onDelete: Cascade)
+  orderItem   OrderItem    @relation(fields: [orderItemId], references: [id], onDelete: CASCADE)
   optionId    String?
   option      ProductOption? @relation(fields: [optionId], references: [id])
   value       String
