@@ -1,5 +1,5 @@
-// Mock Prisma client - will use real DB in production
-export default {
+// Simple db mock for now - will use Prisma in production
+export const prisma = {
   user: {
     findUnique: async () => null,
     findMany: async () => [],

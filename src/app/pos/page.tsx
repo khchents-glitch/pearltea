@@ -77,7 +77,7 @@ export default function POSPage() {
     })
   }
 
-  const updateQuantity = (id: string, option?: string, delta: number) => {
+  const updateQuantity = (id: string, delta: number, option?: string) => {
     setCart((prev) => {
       const existing = prev.find((item) => item.id === id && item.option === option)
       if (!existing) return prev
@@ -235,14 +235,14 @@ export default function POSPage() {
                   </div>
                   <div className="flex items-center gap-2">
                     <button
-                      onClick={() => updateQuantity(item.id, item.option, -1)}
+                      onClick={() => updateQuantity(item.id, -1, item.option)}
                       className="w-8 h-8 bg-gray-200 rounded hover:bg-gray-300"
                     >
                       -
                     </button>
                     <span className="font-medium">{item.quantity}</span>
                     <button
-                      onClick={() => updateQuantity(item.id, item.option, 1)}
+                      onClick={() => updateQuantity(item.id, 1, item.option)}
                       className="w-8 h-8 bg-gray-200 rounded hover:bg-gray-300"
                     >
                       +
@@ -293,14 +293,14 @@ export default function POSPage() {
                 <p className="text-pink-500 font-bold text-xl mt-2">{item.price * item.quantity} 元</p>
                 <div className="flex justify-center gap-2 mt-auto py-6">
                   <button
-                    onClick={() => updateQuantity(item.id, item.option, -1)}
+                    onClick={() => updateQuantity(item.id, -1, item.option)}
                     className="w-10 h-10 bg-gray-200 rounded-lg text-xl hover:bg-gray-300"
                   >
                     -
                   </button>
                   <span className="text-xl font-medium">{item.quantity}</span>
                   <button
-                    onClick={() => updateQuantity(item.id, item.option, 1)}
+                    onClick={() => updateQuantity(item.id, 1, item.option)}
                     className="w-10 h-10 bg-gray-200 rounded-lg text-xl hover:bg-gray-300"
                   >
                     +
