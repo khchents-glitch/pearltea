@@ -1,34 +1,28 @@
-import { PrismaClient } from '@prisma/client'
-import { PrismaPg } from '@prisma/adapter-pg'
-import pg from 'pg'
+// Initialize PrismaClient with error handling for build-time safety
+let prisma: any = null
 
-const { Pool } = pg
+try {
+  const { PrismaClient } = require('@prisma/client')
+  const { PrismaPg } = require('@prisma/adapter-pg')
+  const pg = require('pg')
 
-const globalForPrisma = globalThis as unknown as {
-  prisma: PrismaClient | undefined
+  // Only try to connect if DATABASE_URL is set and not localhost
+  if (process.env.DATABASE_URL && !process.env.DATABASE_URL.includes('localhost')) {
+    try {
+      const { Pool } = pg
+      const connectionString = process.env.DATABASE_URL
+      const pool = new Pool({ connectionString })
+      const adapter = new PrismaPg(pool)
+      prisma = new PrismaClient({ adapter })
+    } catch (error: any) {
+      console.warn('Failed to create Prisma client:', error?.message)
+    }
+  } else if (!process.env.DATABASE_URL) {
+    console.warn('DATABASE_URL not set, using mock data')
+  }
+} catch (error: any) {
+  console.warn('Prisma not available:', error?.message)
 }
 
-function createPrismaClient() {
-  const connectionString = process.env.DATABASE_URL
-  
-  // Skip if no DATABASE_URL or if it's localhost (dev mode)
-  if (!connectionString || connectionString.includes('localhost')) {
-    console.warn('DATABASE_URL not set or localhost, using mock data')
-    return null
-  }
-
-  try {
-    const pool = new Pool({ connectionString })
-    const adapter = new PrismaPg(pool)
-    return new PrismaClient({ adapter })
-  } catch (error) {
-    console.error('Failed to create Prisma client:', error)
-    return null
-  }
-}
-
-const prisma = globalForPrisma.prisma ?? createPrismaClient()
-
-if (process.env.NODE_ENV !== 'production' && prisma) globalForPrisma.prisma = prisma
-
+// Export either null or initialized Prisma client
 export default prisma
