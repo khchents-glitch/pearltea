@@ -11,8 +11,9 @@ const globalForPrisma = globalThis as unknown as {
 function createPrismaClient() {
   const connectionString = process.env.DATABASE_URL
   
-  if (!connectionString) {
-    console.warn('DATABASE_URL not set, using mock data')
+  // Skip if no DATABASE_URL or if it's localhost (dev mode)
+  if (!connectionString || connectionString.includes('localhost')) {
+    console.warn('DATABASE_URL not set or localhost, using mock data')
     return null
   }
 
