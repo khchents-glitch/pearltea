@@ -1,5 +1,5 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
+// Prisma Schema for PearlTea POS
+// Database: PostgreSQL
 
 generator client {
   provider = "prisma-client-js"
@@ -7,4 +7,84 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+}
+
+// ========== Users ==========
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String?
+  createdAt DateTime @default(now())
+}
+
+// ========== Categories ==========
+model ProductCategory {
+  id          String    @id @default(uuid())
+  name        String
+  description String?
+  createdAt   DateTime  @default(now())
+  products    Product[]
+}
+
+// ========== Products ==========
+model Product {
+  id          String        @id @default(uuid())
+  name        String
+  price       Float
+  description String?
+  categoryId  String
+  category    ProductCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  orders      OrderItem[]
+}
+
+// ========== Product Options ==========
+model ProductOption {
+  name String @id @unique
+  type String
+}
+
+// ========== Order Items (the link between Order and Product) ==========
+model OrderItem {
+  id          String    @id @default(uuid())
+  orderId     String
+  order       Order     @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId   String
+  product     Product   @relation(fields: [productId], references: [id], onDelete: Restrict)
+
+  // Options selected
+  optionIron  String?
+  optionMilk  String?
+  optionIce   String?
+ _optionSugar String?   // 使用尾字避免保留字衝突
+  optionTeaColor String?
+  optionExtras String?
+  _extrasPrice Float?  // 銷價調整
+  price       Float     // 最終售價
+
+  quantity    Int       @default(1)
+  notes       String?
+  createdAt   DateTime  @default(now())
+}
+
+// ========== Orders ==========
+model Order {
+  id        String    @id @default(uuid())
+  userId    String?
+  user      User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+  
+  // Total amount
+  total     Float
+  subtotal  Float     @default(0)
+  tax       Float     @default(0)
+  
+  // Order items
+  items     OrderItem[]
+  
+  // Order status
+  status    String    @default("pending") // pending, completed, cancelled
+  
+  // Check-in time
+  checkedIn DateTime?
+  createdAt DateTime  @default(now())
 }
