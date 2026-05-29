@@ -6,7 +6,14 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test": "ts-node tests/runner.ts",
+    "test:network": "ts-node tests/network.ts",
+    "test:database": "ts-node tests/database.ts",
+    "test:api": "ts-node tests/api.ts",
+    "test:db:seed": "npx prisma db seed",
+    "test:db:migrate": "npx prisma migrate dev",
+    "test:db:studio": "npx prisma studio"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^6.19.0",
@@ -30,6 +37,7 @@
     "@types/react-dom": "^19.2.3",
     "eslint": "^10.4.0",
     "eslint-config-next": "^16.2.6",
-    "typescript": "^6.0.3"
+    "ts-node": "^10.9.2",
+    "typescript": "6.0.3"
   }
 }
