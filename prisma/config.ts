@@ -1,18 +1,19 @@
 import { PrismaClient } from '@prisma/client'
-import { PrismaPGAdapter } from '@prisma/adapter-pg'
-import { readFileSync } from 'fs'
-import { join } from 'path'
 
 const databaseUrl = process.env.DATABASE_URL
 
-// PostgreSQL adapter for Prisma 7
+// For Zeabur PostgreSQL deployment
 if (databaseUrl?.startsWith('postgresql://') || databaseUrl?.startsWith('postgres://')) {
-  const adapter = new PrismaPGAdapter({
-    url: databaseUrl,
+  // Direct connection without adapter (Prisma 7)
+  export const prisma = new PrismaClient({
+    datasources: {
+      db: {
+        url: databaseUrl,
+      },
+    },
   })
-  export const prisma = new PrismaClient({ adapter })
 } else {
-  // SQLite for development (if needed, remove this else branch later)
+  // SQLite fallback (if needed)
   export const prisma = new PrismaClient({
     datasources: {
       db: {

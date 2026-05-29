@@ -4,119 +4,118 @@
 const { PrismaClient } = require('@prisma/client')
 require('dotenv').config({ path: '.env' })
 
-const databaseUrl = process.env.DATABASE_URL
-
 let prisma
 
 async function simpleTest() {
-  console.log('\n🧪 PearlTea POS - Simple PostgreSQL Database Test\n')
-  console.log('DATABASE_URL:', databaseUrl?.replace(/:[^:]*@/, ':****@'))
+  console.log('\n🧪 PearlTea POS - Simple Database Test\n')
 
   try {
-    // Determine database type and create appropriate PrismaClient
-    if (databaseUrl?.startsWith('postgresql://') || databaseUrl?.startsWith('postgres://')) {
-      // PostgreSQL setup
-      const { PrismaPGAdapter } = require('@prisma/adapter-pg')
-      const adapter = new PrismaPGAdapter({
-        url: databaseUrl,
-      })
-      prisma = new PrismaClient({ adapter })
-      console.log('✅ Using PostgreSQL adapter\n')
+    // Load environment variables
+    const databaseUrl = process.env.DATABASE_URL
 
-      // Test 1: Connection
-      console.log('1️⃣ Database Connection')
-      try {
-        await prisma.$connect()
-        console.log('   ✅ Connected to PostgreSQL\n')
-      } catch (error) {
-        console.log(`   ❌ Connection failed: ${error.message}\n`)
-        console.log('💡 Tips:')
-        console.log('   1. Make sure PostgreSQL is running locally')
-        console.log('   2. Check: sudo systemctl status postgresql')
-        console.log('   3. Verify .env DATABASE_URL is correct')
-        console.log('   4. Try: sudo systemctl start postgresql\n')
-        return {
-          total: 0,
-          passed: 0,
-          failed: 0,
-          rate: 0,
-        }
-      }
-
-      // Test 2: User table
-      console.log('2️⃣ User Table Query')
-      const users = await prisma.user.findMany()
-      console.log(`   ✅ User table exists with ${users.length} records\n`)
-      if (users.length > 0) {
-        users.forEach(user => {
-          console.log(`      - ${user.email}`)
-        })
-      } else {
-        console.log('         ℹ️  No users found - run npx prisma db seed to populate data')
-      }
-
-      // Test 3: Product table
-      console.log('3️⃣ Product Table Query')
-      const products = await prisma.product.findMany()
-      console.log(`   ✅ Product table exists with ${products.length} records\n`)
-      if (products.length > 0) {
-        products.forEach(product => {
-          console.log(`      - ${product.name} - $${product.price}`)
-        })
-      } else {
-        console.log('         ℹ️  No products found - run npx prisma db seed to populate data')
-      }
-
-      // Test 4: Category table
-      console.log('4️⃣ Category Table Query')
-      const categories = await prisma.productCategory.findMany()
-      console.log(`   ✅ Category table exists with ${categories.length} categories\n`)
-      if (categories.length > 0) {
-        categories.forEach(category => {
-          console.log(`      - ${category.name}`)
-        })
-      } else {
-        console.log('         ℹ️  No categories found - run npx prisma db seed to populate data')
-      }
-
-      // Test 5: Order table
-      console.log('5️⃣ Order Table Query')
-      const orders = await prisma.order.findMany()
-      console.log(`   ✅ Order table exists with ${orders.length} orders\n`)
-      if (orders.length > 0) {
-        orders.forEach(order => {
-          console.log(`      - Order #${order.orderNumber}: $${order.total} - ${order.customerName || 'Unknown'}`)
-        })
-      }
-
-      const results = {
-        total: 5,
-        passed: 5,
-        failed: 0,
-        rate: 100,
-      }
-
-      console.log('\n📊 Summary')
-      console.log(`   Total:  ${results.total}`)
-      console.log(`   Passed: ${results.passed}`)
-      console.log(`   Failed: ${results.failed}`)
-      console.log(`   Rate:   ${results.rate}%`)
-      console.log()
-      console.log('✅ All PostgreSQL tests passed!')
-    } else {
-      console.log('❌ Invalid DATABASE_URL format')
-      console.log('   Expected: postgresql://username:password@host:port/database\n')
-      console.log('💡 To use PostgreSQL:')
-      console.log('   1. Install and start PostgreSQL: sudo systemctl start postgresql')
-      console.log('   2. Create database: createdb pearltea')
-      console.log('   3. Update .env with correct connection string\n')
-
+    if (!databaseUrl) {
+      console.log('❌ DATABASE_URL is not set')
+      console.log('💡 Set DATABASE_URL in .env file')
       return {
         total: 0,
         passed: 0,
-        failed: 0,
+        failed: 1,
         rate: 0,
       }
+    }
+
+    console.log('DATABASE_URL:', databaseUrl.replace(/:[^:]*@/, ':****@'))
+
+    // Create PrismaClient with datasource configuration
+    prisma = new PrismaClient({
+      datasources: {
+        db: {
+          url: databaseUrl,
+        },
+      },
+    })
+
+    // Test 1: Connection
+    console.log('1️⃣ Database Connection')
+    try {
+      await prisma.$connect()
+      console.log('   ✅ Connected successfully\n')
+    } catch (error) {
+      console.log(`   ❌ Connection failed: ${error.message}\n`)
+      console.log('💡 Troubleshooting:')
+      console.log('   1. Check if database exists: sudo psql -U postgres -l')
+      console.log('   2. Verify DATABASE_URL format')
+      console.log('   3. Check PostgreSQL service: sudo systemctl status postgresql\n')
+      return {
+        total: 0,
+        passed: 0,
+        failed: 1,
+        rate: 0,
+      }
+    }
+
+    // Test 2: User model
+    console.log('2️⃣ User Model')
+    try {
+      const users = await prisma.user.findMany()
+      console.log(`   ✅ Database connection works! Found ${users.length} users\n`)
+      results.passed++
+    } catch (error) {
+      console.log(`   ❌ User query failed: ${error.message}\n`)
+      results.failed++
+    }
+
+    // Test 3: Product model
+    console.log('3️⃣ Product Model')
+    try {
+      const products = await prisma.product.findMany()
+      console.log(`   ✅ Product table exists! Found ${products.length} products\n`)
+      results.passed++
+    } catch (error) {
+      console.log(`   ❌ Product query failed: ${error.message}\n`)
+      results.failed++
+    }
+
+    // Test 4: Category model
+    console.log('4️⃣ Category Model')
+    try {
+      const categories = await prisma.productCategory.findMany()
+      console.log(`   ✅ Category table exists! Found ${categories.length} categories\n`)
+      results.passed++
+    } catch (error) {
+      console.log(`   ❌ Category query failed: ${error.message}\n`)
+      results.failed++
+    }
+
+    // Test 5: Order model
+    console.log('5️⃣ Order Model')
+    try {
+      const orders = await prisma.order.findMany()
+      console.log(`   ✅ Order table exists! Found ${orders.length} orders\n`)
+      results.passed++
+    } catch (error) {
+      console.log(`   ❌ Order query failed: ${error.message}\n`)
+      results.failed++
+    }
+
+    const results = {
+      total: 5,
+      passed: results.passed,
+      failed: results.failed,
+      rate: results.total > 0 ? ((results.passed / results.total) * 100) : 0,
+    }
+
+    console.log('\n📊 Summary')
+    console.log(`   Total:  ${results.total}`)
+    console.log(`   Passed: ${results.passed}`)
+    console.log(`   Failed: ${results.failed}`)
+    console.log(`   Rate:   ${results.rate}%`)
+    console.log()
+
+    if (results.passed === results.total) {
+      console.log('✅ All database tests passed!')
+    } else {
+      console.log(`⚠️  ${results.failed} test(s) failed`)
     }
   } catch (error) {
     console.error('❌ Test error:', error.message)
