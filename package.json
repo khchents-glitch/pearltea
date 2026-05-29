@@ -20,6 +20,7 @@
     "db:seed:admin": "node prisma/seed-admin.js",
     "db:seed:products": "node prisma/seed-products.js",
     "db:seed:all": "node prisma/seed-admin.js && node prisma/seed-products.js",
+    "db:seed:order": "node prisma/seed-order.js",
     "db:studio": "npx prisma studio",
     "db:generate": "npx prisma generate",
     "db:check": "npx prisma validate"
