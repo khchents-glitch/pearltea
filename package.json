@@ -13,10 +13,10 @@
     "test:database": "ts-node tests/database.ts",
     "test:api": "ts-node tests/api.ts",
     "db:push": "npx prisma db push",
-    "db:migrate": "npx prisma migrate dev",
+    "db:migrate": "npx prisma migrate dev --skip-generate",
     "db:migrate:prod": "npx prisma migrate deploy",
-    "db:reset": "npx prisma migrate reset --force",
-    "db:seed": "npx prisma db seed",
+    "db:reset": "npx prisma migrate reset --force --skip-generate",
+    "db:seed": "prisma db seed",
     "db:studio": "npx prisma studio",
     "db:generate": "npx prisma generate",
     "db:check": "npx prisma validate"
@@ -24,7 +24,6 @@
   "dependencies": {
     "@prisma/adapter-pg": "^6.19.0",
     "@prisma/client": "^7.8.0",
-    "autoprefixer": "^10.5.0",
     "bcryptjs": "^3.0.3",
     "jsonwebtoken": "^9.0.2",
     "next": "14.2.0",
