@@ -18,7 +18,6 @@ export async function GET(
         items: {
           include: { product: true },
         },
-        statusHistory: true,
       },
     })
 
@@ -53,16 +52,9 @@ export async function PATCH(
       where: { id: params.id },
       data: {
         status,
-        statusHistory: {
-          create: {
-            status,
-            note,
-          },
-        },
       },
       include: {
         items: true,
-        statusHistory: true,
       },
     })
 
