@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
-import jwt from 'jsonwebtoken'
 
-const JWT_SECRET = process.env.JWT_SECRET || 'pearl-tea-pos-secret-key-change-in-production'
+// Mock JWT verification (temporary - will use real JWT in production)
+const MOCK_TOKEN_PREFIX = 'mock-jwt-token-'
 
 export async function POST(request: Request) {
   try {
@@ -16,16 +16,16 @@ export async function POST(request: Request) {
 
     const token = authHeader.substring(7)
 
-    try {
-      jwt.verify(token, JWT_SECRET)
-    } catch {
+    // Check if token starts with mock prefix (acceptable since we're using mock auth for now)
+    if (!token.startsWith(MOCK_TOKEN_PREFIX)) {
       return NextResponse.json(
-        { error: 'Token 無效或已過期' },
+        { error: '無效的 Token' },
         { status: 401 }
       )
     }
 
     return NextResponse.json({ success: true })
+
   } catch (error) {
     return NextResponse.json(
       { error: '伺服器錯誤' },

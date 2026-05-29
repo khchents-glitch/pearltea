@@ -1,15 +1,26 @@
 import { NextResponse } from 'next/server'
-import prisma from '@/lib/db'
+
+// Dynamic import to get getPrisma function
+let getPrisma: any
 
 export const dynamic = 'force-dynamic'
 
+async function initPrisma() {
+  if (!getPrisma) {
+    const dbModule = await import('@/lib/db')
+    getPrisma = dbModule.getPrisma
+  }
+  return getPrisma()
+}
+
 export async function GET() {
   try {
-    if (!prisma) {
+    const apiPrisma = await initPrisma()
+    if (!apiPrisma) {
       return NextResponse.json([])
     }
 
-    const orders = await prisma.order.findMany({
+    const orders = await apiPrisma.order.findMany({
       include: {
         items: {
           include: { product: true },
@@ -27,11 +38,12 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
+    const apiPrisma = await initPrisma()
     const body = await request.json()
     const { items, customerName, remarks, total } = body
 
     // Use mock response if DATABASE_URL is not configured
-    if (!prisma) {
+    if (!apiPrisma) {
       const orderId = 'order-' + Date.now()
       const orderNumber = 'ORD' + Date.now().toString().slice(-6)
       return NextResponse.json({ orderId, orderNumber })
@@ -39,8 +51,9 @@ export async function POST(request: Request) {
 
     const orderNumber = 'ORD' + Date.now().toString().slice(-6)
 
-    const order = await prisma.order.create({
+    const order = await apiPrisma.order.create({
       data: {
+        userId: 'admin',
         orderNumber,
         customerName: customerName || null,
         remarks: remarks || null,
@@ -48,17 +61,12 @@ export async function POST(request: Request) {
         items: {
           create: items.map((item: any) => ({
             productId: item.id,
-            quantity: item.quantity,
-            price: item.price,
-            remark: item.option || null,
-          })),
-        },
-      },
-      include: {
-        items: {
-          include: { product: true },
-        },
-      },
+            quantity: item.quantity || 1,
+            price: item.price * (item.quantity || 1),
+            notes: item.notes || null,
+          }))
+        }
+      }
     })
 
     return NextResponse.json(order)

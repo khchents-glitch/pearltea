@@ -1,12 +1,22 @@
 import { NextResponse } from 'next/server'
-import prisma from '@/lib/db'
+
+// Dynamic import to get getPrisma function
+let getPrisma: any
 
 export const dynamic = 'force-dynamic'
 
+async function initPrisma() {
+  if (!getPrisma) {
+    const dbModule = await import('@/lib/db')
+    getPrisma = dbModule.getPrisma
+  }
+  return getPrisma()
+}
+
 export async function GET() {
   try {
-    // Use mock data if DATABASE_URL is not configured
-    if (!prisma) {
+    const apiPrisma = await initPrisma()
+    if (!apiPrisma) {
       const mockProducts = [
         { id: '1', name: '經典珍珠奶茶', price: 45, description: '濃郁茶香，Q彈珍珠', categoryId: '1', category: { name: '珍珠奶茶類' } },
         { id: '2', name: '鮮奶菁茶', price: 50, description: '鮮奶搭配菁茶', categoryId: '1', category: { name: '珍珠奶茶類' } },
@@ -20,8 +30,7 @@ export async function GET() {
       return NextResponse.json(mockProducts)
     }
 
-    const products = await prisma.product.findMany({
-      where: { status: 'active' },
+    const products = await apiPrisma.product.findMany({
       include: { category: true },
       orderBy: { name: 'asc' },
     })

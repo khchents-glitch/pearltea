@@ -7,8 +7,8 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
+
 
 // ========== Users ==========
 model User {
@@ -17,6 +17,8 @@ model User {
   password  String
   name      String?
   createdAt DateTime @default(now())
+
+  orders    Order[]
 }
 
 // ========== Categories ==========
@@ -57,10 +59,10 @@ model OrderItem {
   optionIron  String?
   optionMilk  String?
   optionIce   String?
- _optionSugar String?   // 使用尾字避免保留字衝突
+  optionSugar  String?
   optionTeaColor String?
   optionExtras String?
-  _extrasPrice Float?  // 銷價調整
+  extrasPrice Float?  // 銷價調整 (配件加價)
   price       Float     // 最終售價
 
   quantity    Int       @default(1)
