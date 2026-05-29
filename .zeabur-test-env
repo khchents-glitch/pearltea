@@ -1,0 +1,5 @@
+# Zeabur 部署時的 URL（生產環境）
+DATABASE_URL="postgresql://postgres:postgres@zeabur-sql-xxx.zeabur.app:5432/pearltea?schema=public"
+
+# JWT Secret（生產環境需要換一個更強的）
+JWT_SECRET="pearl-ta-prod-secret-key-change-this-long-random-string"

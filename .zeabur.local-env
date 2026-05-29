@@ -1,0 +1,5 @@
+# 本地開發用 PostgreSQL
+DATABASE_URL="postgresql://localhost:5432/pearltea_local?schema=public"
+
+# JWT Secret
+JWT_SECRET="pearl-ta-dev-secret-key-please-change-in-production"

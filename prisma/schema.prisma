@@ -5,7 +5,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
 }
 
 model User {
@@ -34,93 +34,93 @@ enum ProductOptionType {
 }
 
 model ProductCategory {
-  id            String              @id @default(uuid())
-  name          String
-  description   String?
-  createdAt     DateTime            @default(now())
-  updatedAt     DateTime            @updatedAt
+  id             String          @id @default(uuid())
+  name           String
+  description    String?
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
   productOptions ProductOption[]
-  products      Product[]
+  products       Product[]
 }
 
 model ProductOption {
-  id            String              @id @default(uuid())
-  name          String
-  type          ProductOptionType
-  category      ProductCategory?    @relation(fields: [categoryId], references: [id])
-  categoryId    String?
-  createdAt     DateTime            @default(now())
-  updatedAt     DateTime            @updatedAt
-  orders        OrderOption[]
-  products      ProductOptionItem[]
+  id         String              @id @default(uuid())
+  name       String
+  type       ProductOptionType
+  category   ProductCategory?    @relation(fields: [categoryId], references: [id])
+  categoryId String?
+  createdAt  DateTime            @default(now())
+  updatedAt  DateTime            @updatedAt
+  orders     OrderOption[]
+  products   ProductOptionItem[]
 }
 
 model ProductOptionItem {
-  id            String              @id @default(uuid())
-  optionId      String
-  option        ProductOption       @relation(fields: [optionId], references: [id])
-  productId     String
-  product       Product             @relation(fields: [productId], references: [id])
-  createdAt     DateTime            @default(now())
+  id        String        @id @default(uuid())
+  optionId  String
+  option    ProductOption @relation(fields: [optionId], references: [id])
+  productId String
+  product   Product       @relation(fields: [productId], references: [id])
+  createdAt DateTime      @default(now())
 }
 
 model Product {
-  id              String              @id @default(uuid())
-  name            String
-  price           Int
-  description     String?
-  categoryId      String
-  category        ProductCategory     @relation(fields: [categoryId], references: [id])
-  status          String              @default("active")
-  createdAt       DateTime            @default(now())
-  updatedAt       DateTime            @updatedAt
-  optionsItems    ProductOptionItem[]
-  orderItems      OrderItem[]
+  id           String              @id @default(uuid())
+  name         String
+  price        Int
+  description  String?
+  categoryId   String
+  category     ProductCategory     @relation(fields: [categoryId], references: [id])
+  status       String              @default("active")
+  createdAt    DateTime            @default(now())
+  updatedAt    DateTime            @updatedAt
+  optionsItems ProductOptionItem[]
+  orderItems   OrderItem[]
 }
 
 model OrderStatusHistory {
-  id        String         @id @default(uuid())
-  orderId   String
-  order     Order          @relation(fields: [orderId], references: [id])
-  status    OrderStatus
-  note      String?
-  changedBy String?
-  createdAt DateTime       @default(now())
-}
-
-model Order {
-  id              String             @id @default(uuid())
-  orderNumber     String             @unique
-  customerName    String?
-  employeeId      String?
-  total           Int
-  status          OrderStatus        @default(PENDING)
-  remarks         String?
-  createdAt       DateTime           @default(now())
-  updatedAt       DateTime           @updatedAt
-  items           OrderItem[]
-  statusHistory   OrderStatusHistory[]
-}
-
-model OrderItem {
   id        String      @id @default(uuid())
   orderId   String
   order     Order       @relation(fields: [orderId], references: [id])
-  productId String
-  product   Product     @relation(fields: [productId], references: [id])
-  options   OrderOption[]
-  quantity  Int         @default(1)
-  remark    String?
-  price     Int
+  status    OrderStatus
+  note      String?
+  changedBy String?
   createdAt DateTime    @default(now())
 }
 
+model Order {
+  id            String               @id @default(uuid())
+  orderNumber   String               @unique
+  customerName  String?
+  employeeId    String?
+  total         Int
+  status        OrderStatus          @default(PENDING)
+  remarks       String?
+  createdAt     DateTime             @default(now())
+  updatedAt     DateTime             @updatedAt
+  items         OrderItem[]
+  statusHistory OrderStatusHistory[]
+}
+
+model OrderItem {
+  id        String        @id @default(uuid())
+  orderId   String
+  order     Order         @relation(fields: [orderId], references: [id])
+  productId String
+  product   Product       @relation(fields: [productId], references: [id])
+  options   OrderOption[]
+  quantity  Int           @default(1)
+  remark    String?
+  price     Int
+  createdAt DateTime      @default(now())
+}
+
 model OrderOption {
-  id          String       @id @default(uuid())
+  id          String         @id @default(uuid())
   orderItemId String
-  orderItem   OrderItem    @relation(fields: [orderItemId], references: [id])
+  orderItem   OrderItem      @relation(fields: [orderItemId], references: [id])
   optionId    String?
   option      ProductOption? @relation(fields: [optionId], references: [id])
   value       String
-  createdAt   DateTime     @default(now())
+  createdAt   DateTime       @default(now())
 }
