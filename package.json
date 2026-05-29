@@ -17,6 +17,9 @@
     "db:migrate:prod": "npx prisma migrate deploy",
     "db:reset": "npx prisma migrate reset --force --skip-generate",
     "db:seed": "prisma db seed",
+    "db:seed:admin": "node prisma/seed-admin.js",
+    "db:seed:products": "node prisma/seed-products.js",
+    "db:seed:all": "node prisma/seed-admin.js && node prisma/seed-products.js",
     "db:studio": "npx prisma studio",
     "db:generate": "npx prisma generate",
     "db:check": "npx prisma validate"
