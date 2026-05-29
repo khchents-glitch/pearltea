@@ -8,8 +8,8 @@ import { generateReport } from './report'
 
 async function runAllTests() {
   console.log('╔══════════════════════════════════════════════════════════╗')
-  console.log('║   🧪 PearlTea POS System - Complete Test Suite           ║')
-  console.log('║   PerlPos v1.0 - Test Execution                          ║')
+  console.log('║   🧪 PearlTea POS System - PostgreSQL Test Suite        ║')
+  console.log('║   PerlPos v1.0 - Test Execution                         ║')
   console.log('╚══════════════════════════════════════════════════════════╝\n')
 
   const startTime = Date.now()
@@ -38,10 +38,6 @@ async function runAllTests() {
     (results.network.tests?.filter((t: any) => t.status === 'FAIL').length || 0) +
     (results.database?.failed || 0) +
     (results.api?.filter((r: any) => r.status === 'FAIL').length || 0)
-  const totalSkipped =
-    (results.network.tests?.filter((t: any) => t.status === 'SKIP').length || 0) +
-    (results.database?.failed || 0) +
-    (results.api?.filter((r: any) => r.status === 'SKIP').length || 0)
 
   const overallPassRate = totalTests > 0 ? ((totalPassed / totalTests) * 100).toFixed(1) : '0.0'
   const duration = ((endTime - startTime) / 1000).toFixed(2)
@@ -52,7 +48,6 @@ async function runAllTests() {
   console.log(`Total Tests:         ${totalTests}`)
   console.log(`✅ Passed:           ${totalPassed}`)
   console.log(`❌ Failed:           ${totalFailed}`)
-  console.log(`⏭️  Skipped/Skip:    ${totalSkipped}`)
   console.log(`Success Rate:        ${overallPassRate}%`)
   console.log(`Duration:            ${duration}s\n`)
 
@@ -71,10 +66,9 @@ async function runAllTests() {
     console.log('❌ Some tests failed. Please review the errors above.')
     console.log('\n🔧 Troubleshooting:')
     console.log('   1. Check database connection status')
-    console.log('   2. Verify API server is running')
-    console.log('   3. Review error logs in test results')
-    console.log('   4. Check environment variables and configuration")
-    console.log('   5. Ensure all dependencies are installed\n') // Fixed missing closing quote
+    console.log('   2. Verify database credentials in .env')
+    console.log('   3. Run: npm run db:reset')
+    console.log('   4. Check error logs in test results')
   }
 
   console.log(`${'═'.repeat(60)}\n`)

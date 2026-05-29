@@ -1,5 +1,23 @@
 import { PrismaClient } from '@prisma/client'
+import { PrismaPGAdapter } from '@prisma/adapter-pg'
+import { readFileSync } from 'fs'
+import { join } from 'path'
 
-// Prisma 7.x: Use client with default env in module
-// DATABASE_URL must be set in environment BEFORE this module loads
-export const prisma = new PrismaClient()
+const databaseUrl = process.env.DATABASE_URL
+
+// PostgreSQL adapter for Prisma 7
+if (databaseUrl?.startsWith('postgresql://') || databaseUrl?.startsWith('postgres://')) {
+  const adapter = new PrismaPGAdapter({
+    url: databaseUrl,
+  })
+  export const prisma = new PrismaClient({ adapter })
+} else {
+  // SQLite for development (if needed, remove this else branch later)
+  export const prisma = new PrismaClient({
+    datasources: {
+      db: {
+        url: process.env.DATABASE_URL,
+      },
+    },
+  })
+}
